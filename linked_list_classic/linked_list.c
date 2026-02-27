@@ -43,11 +43,11 @@ void list_destroy(LinkedList* list) {
 }
 
 void list_insert_first(LinkedList* list, Element element) {
-    Node* newNode = malloc(sizeof(Node));
+    Node* new_node = malloc(sizeof(Node));
 
-    newNode->element = element;
-    newNode->next = list->head;
-    list->head = newNode;
+    new_node->element = element;
+    new_node->next = list->head;
+    list->head = new_node;
     list->size++;
 }
 
@@ -63,11 +63,11 @@ void list_insert_after(LinkedList *list, size_t position, Element element) {
             i++;
         }
 
-        Node* newNode = malloc(sizeof(Node));        
+        Node* new_node = malloc(sizeof(Node));        
         
-        newNode->element = element;
-        newNode->next = cur->next;
-        cur->next = newNode;
+        new_node->element = element;
+        new_node->next = cur->next;
+        cur->next = new_node;
         list->size++;
     }
 }
