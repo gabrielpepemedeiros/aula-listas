@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 
 typedef struct Node {
     Element element;
@@ -13,6 +12,14 @@ struct LinkedList {
     Node* head;
     size_t size;
 };
+
+void list_error(const char* message) {
+    fprintf(stderr, "Error: %s\n", message);
+}
+
+bool list_is_position_valid(LinkedList* list, size_t position) {
+    return position < list_size(list);
+}
 
 LinkedList* list_create() {
     LinkedList* list = malloc(sizeof(LinkedList));
@@ -36,12 +43,93 @@ void list_destroy(LinkedList* list) {
 }
 
 void list_insert_first(LinkedList* list, Element element) {
-    Node* new_node = malloc(sizeof(Node));
+    Node* newNode = malloc(sizeof(Node));
 
-    new_node->element = element;
-    new_node->next = list->head;
-    list->head = new_node;
+    newNode->element = element;
+    newNode->next = list->head;
+    list->head = newNode;
     list->size++;
+}
+
+void list_insert_after(LinkedList *list, size_t position, Element element) {
+    if (!list_is_position_valid(list, position)) {
+        list_error("Invalid position");
+    } else {
+        Node* cur = list->head;
+        size_t i = 0;       
+
+        while (i < position) {
+            cur = cur->next;
+            i++;
+        }
+
+        Node* newNode = malloc(sizeof(Node));        
+        
+        newNode->element = element;
+        newNode->next = cur->next;
+        cur->next = newNode;
+        list->size++;
+    }
+}
+
+void list_remove_first(LinkedList* list) {
+    if (list_is_empty(list)) {
+        list_error("List is empty");
+    } else {
+        Node* trash = list->head;
+
+        list->head = list->head->next;
+        free(trash);
+        list->size--;
+    }
+}
+
+void list_remove_at(LinkedList* list, size_t position) {
+    if (!list_is_position_valid(list, position)) {
+        list_error("Invalid position");
+    } else if (position == 0) {
+        list_remove_first(list);
+    } else {
+        Node* prev = list->head;
+        size_t i = 0;
+
+        while (i < position - 1) {
+            prev = prev->next;
+            i++;
+        }
+
+        Node* trash = prev->next;
+
+        prev->next = trash->next;
+        free(trash);
+        list->size--;
+    }
+}
+
+Element list_get_at(LinkedList* list, size_t position) {
+    if (!list_is_position_valid(list, position)) {
+        list_error("Invalid position");
+        
+        return element_null();
+    } else {
+        Node* cur = list->head;
+        size_t i = 0;
+
+        while (i < position) {
+            cur = cur->next;
+            i++;
+        }
+
+        return cur->element;
+    }
+}
+
+size_t list_size(LinkedList* list) {
+    return list->size;
+}
+
+bool list_is_empty(LinkedList* list) {
+    return list->size == 0;
 }
 
 void list_print(LinkedList* list) {
@@ -57,4 +145,25 @@ void list_print(LinkedList* list) {
     printf("\n");
 }
 
-// continue on next class...
+/**
+ * Search for an element in the list
+ * 
+ * @param list The list to search
+ * @param element The element to search for
+ * 
+ * @return The position of the element in the list, or -1 if the element is not found
+*/
+size_t list_search(LinkedList* list, Element element) {
+    Node* cur = list->head;
+    size_t position = 0;
+
+    while (cur != NULL) {
+        if (element_compare(&cur->element, &element) == 0) {
+            return position;
+        }
+        cur = cur->next;
+        position++;
+    }
+
+    return -1;
+}
